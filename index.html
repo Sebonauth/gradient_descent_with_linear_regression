@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Descent with Linear Regression</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            font-size: 150%;
+        }
+        section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+            margin-top: 20px;
+        }
+        p, li {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .image-placeholder, .interactive-placeholder, .continue-button, .vocab-section, .why-it-matters, .test-your-knowledge, .faq-section, .stop-and-think {
+            text-align: left;
+        }
+        .image-placeholder img, .interactive-placeholder img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .vocab-section, .why-it-matters, .test-your-knowledge, .faq-section, .stop-and-think {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .vocab-section {
+            background-color: #f0f8ff;
+        }
+        .vocab-section h3 {
+            color: #1e90ff;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .vocab-section h4 {
+            color: #000;
+            font-size: 0.9em;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+        .vocab-term {
+            font-weight: bold;
+            color: #1e90ff;
+        }
+        .why-it-matters {
+            background-color: #ffe6f0;
+        }
+        .why-it-matters h3 {
+            color: #d81b60;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .stop-and-think {
+            background-color: #e6e6ff;
+        }
+        .stop-and-think h3 {
+            color: #4b0082;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .continue-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            color: #ffffff;
+            background-color: #007bff;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .reveal-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            color: #ffffff;
+            background-color: #4b0082;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .test-your-knowledge {
+            background-color: #e6ffe6;
+        }
+        .test-your-knowledge h3 {
+            color: #28a745;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .test-your-knowledge h4 {
+            color: #000;
+            font-size: 0.9em;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+        .test-your-knowledge p {
+            margin-bottom: 15px;
+        }
+        .check-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            color: #ffffff;
+            background-color: #28a745;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-size: 1em;
+        }
+        .faq-section {
+            background-color: #fffbea;
+        }
+        .faq-section h3 {
+            color: #ffcc00;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+        .faq-section h4 {
+            color: #000;
+            font-size: 0.9em;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <section id="section1">
+        <h1>Gradient Descent with Linear Regression</h1>
+        <p>Welcome back! In the last lesson, we learned that Gradient Descent is like finding the lowest point in a foggy valley. We take steps downhill, guided by the steepness of the terrain. The size of our steps is determined by the learning rate (α), and the direction is determined by the gradient of the cost function.</p>
+            <div class="continue-button" onclick="showNextSection(2)">Continue</div>
+            </section>
+    <section id="section2">
+        <p>Let's quickly recap the update rule:</p>
+        <p>\[ \beta_{new} = \beta_{old} - \alpha * \nabla C(\beta_{old}) \]</p>
+        <div class="vocab-section">
+            <h3>Build Your Vocab</h3>
+            <h4 class="vocab-term">Gradient</h4>
+            <p>A vector that points in the direction of the greatest rate of increase of a function. Its magnitude represents the steepness of the slope.</p>
+        </div>
+        <div class="continue-button" onclick="showNextSection(3)">Continue</div>
+    </section>
+
+    <section id="section3">
+        <h2>Linear Regression and the Sum of Squares Error</h2>
+        <p>Now, let's apply Gradient Descent to a specific machine learning model: <strong>Linear Regression</strong>. The goal of linear regression is to find the best-fitting straight line through a set of data points. This line can then be used to make predictions for new, unseen data.</p>
+        <div class="continue-button" onclick="showNextSection(4)">Continue</div>
+            </section>
+    <section id="section4">
+        <p>But how do we define "best-fitting"? This is where the <strong>cost function</strong> comes in. For linear regression, a common cost function is the <strong>Sum of Squares Error (SSE)</strong>. It measures the sum of the squared differences between the actual data points and the predicted values on the line.</p>
+        <div class="image-placeholder">
+            <img src="/placeholder.svg?height=300&width=600" alt="Image of a scatter plot with a line of best fit. Some vertical lines highlight the distance between data points and the line, representing the errors.">
+        </div>
+        <div class="continue-button" onclick="showNextSection(5)">Continue</div>
+            </section>
+    <section id="section5">
+        <p>Mathematically, the Sum of Squares Error for a dataset with 'n' data points is defined as:</p>
+        <p>\[ C(\beta) = \frac{1}{2n} \sum_{i=1}^{n} (y^{(i)} - f(x^{(i)}))^2 \]</p>
+        <p>Where:</p>
+        <ul>
+            <li>\(y^{(i)}\) is the actual value of the target variable for the i-th data point. <strong>Target Variable</strong> is what we are trying to predict.</li>
+            <li>\(f(x^{(i)})\) is the predicted value calculated using our linear regression model.</li>
+            <li>\(x^{(i)}\) represents the features (input variables) for the i-th data point. A <strong>Feature</strong> is a measurable property or characteristic of a data point used as input for a machine learning model.</li>
+            <li>The function f is defined as: \(f(x^{(i)}) = \beta_0 + \beta_1 x_1^{(i)} + ... + \beta_m x_m^{(i)}\). The \(\beta\) values are the <strong>coefficients</strong> of the linear regression model – these are the parameters we want to find using Gradient Descent.</li>
+        </ul>
+        <p>The \(\frac{1}{2n}\) factor is for mathematical convenience, as you will see shortly.</p>
+        <div class="continue-button" onclick="showNextSection(6)">Continue</div>
+            </section>
+    <section id="section6">
+        <div class="vocab-section">
+            <h3>Build Your Vocab</h3>
+            <h4 class="vocab-term">Coefficients</h4>
+            <p>In the context of linear regression, these are the numerical values that determine the slope and intercept of the line of best fit. These are the \(\beta\) values in our equation.</p>
+        </div>
+        <div class="continue-button" onclick="showNextSection(7)">Continue</div>
+    </section>
+
+    <section id="section7">
+        <h3>Calculating the Gradient</h3>
+        <p>To use Gradient Descent, we need to calculate the gradient of the SSE cost function with respect to each coefficient \(\beta_j\). The gradient is a vector containing the partial derivatives of the cost function with respect to each \(\beta_j\):</p>
+        <p>\[ \nabla C(\beta) = \left( \frac{\partial C}{\partial \beta_0}, \frac{\partial C}{\partial \beta_1}, ..., \frac{\partial C}{\partial \beta_m} \right) \]</p>
+        <div class="continue-button" onclick="showNextSection(8)">Continue</div>
+            </section>
+    <section id="section8">
+        <p>Let's calculate one of these partial derivatives \(\frac{\partial C}{\partial \beta_j}\):</p>
+        <ol>
+            <li><strong>Start with the SSE function:</strong>
+                <p>\[ C(\beta) = \frac{1}{2n} \sum_{i=1}^{n} (y^{(i)} - (\beta_0 + \beta_1 x_1^{(i)} + ... + \beta_m x_m^{(i)} ))^2 \]</p>
+            </li>
+            <li><strong>Take the partial derivative with respect to a specific coefficient \(\beta_j\):</strong>
+                <p>\[ \frac{\partial C}{\partial \beta_j} = \frac{1}{2n} \sum_{i=1}^{n} 2 * (y^{(i)} - (\beta_0 + \beta_1 x_1^{(i)} + ... + \beta_m x_m^{(i)} )) * (-x_j^{(i)}) \]</p>
+            </li>
+            <li><strong>Simplify (note that \(x_0^{(i)}\) is always 1):</strong>
+                <p>\[ \frac{\partial C}{\partial \beta_j} = -\frac{1}{n} \sum_{i=1}^{n} x_j^{(i)} (y^{(i)} - f(x^{(i)})) \]</p>
+            </li>
+        </ol>
+        <p>This is the formula for the j-th element of the gradient vector. You'll use this to update each \(\beta_j\).</p>
+        <div class="continue-button" onclick="showNextSection(9)">Continue</div>
+            </section>
+    <section id="section9">
+        <p>So, the update rule for each coefficient becomes:</p>
+        <p>\[ \beta_{j_{new}} = \beta_{j_{old}} + \alpha * \frac{1}{n} \sum_{i=1}^{n} x_j^{(i)} (y^{(i)} - f(x^{(i)})) \]</p>
+        <div class="continue-button" onclick="showNextSection(10)">Continue</div>
+    </section>
+
+    <section id="section10">
+        <h3>Hands-on with Gradient Descent</h3>
+        <p>Let's solidify our understanding with a simple example. We have a small dataset with one feature (x) and one target variable (y). Our goal is to find the coefficients \(\beta_0\) (the intercept) and \(\beta_1\) (the slope) of the line that best fits this data. We already did the first Iteration for simplicity.</p>
+        <div class="interactive-placeholder">
+            <table>
+                <tr>
+                    <th>x</th>
+                    <th>y</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>5</td>
+                </tr>
+            </table>
+            <p>Initial values: \(\beta_0 = 0\), \(\beta_1 = 1\), \(\alpha = 0.1\)</p>
+            <p>First iteration calculations:</p>
+            <ul>
+                <li>\(\frac{\partial C}{\partial \beta_0} = -\frac{1}{3}((2-1) + (4-2) + (5-3)) = -\frac{5}{3}\)</li>
+                <li>\(\frac{\partial C}{\partial \beta_1} = -\frac{1}{3}(1(2-1) + 2(4-2) + 3(5-3)) = -\frac{11}{3}\)</li>
+                <li>\(\beta_0 = 0 - 0.1 * (-\frac{5}{3}) = \frac{1}{6}\)</li>
+                <li>\(\beta_1 = 1 - 0.1 * (-\frac{11}{3}) = \frac{37}{30}\)</li>
+            </ul>
+            <div class="continue-button" onclick="showNextSection(11)">Continue</div>
+            </section>
+    <section id="section11">
+            <p>Now, calculate the second iteration:</p>
+            <ul>
+                <li>\(\frac{\partial C}{\partial \beta_0} = \)</li>
+                <li>\(\frac{\partial C}{\partial \beta_1} = \)</li>
+                <li>\(\beta_0 = \)</li>
+                <li>\(\beta_1 = \)</li>
+            </ul>
+        </div>
+        <p>Take your time, work through the calculations step-by-step, and see how the coefficients are updated. Remember, each data point contributes to adjusting the slope and intercept of the line, nudging it towards the best fit.</p>
+        <div class="continue-button" onclick="showNextSection(12)">Continue</div>
+            </section>
+    <section id="section12">
+        <p>Let's tackle a more complex example. Our dataset now has <em>two</em> features (x1, x2) and one target variable (y):</p>
+        <table>
+            <tr>
+                <th>x1</th>
+                <th>x2</th>
+                <th>y</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>3</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>1</td>
+                <td>7</td>
+            </tr>
+        </table>
+        <p>Our linear regression model is: \(y = \beta_0 + \beta_1x_1 + \beta_2x_2\). Let's assume our initial coefficients are: \(\beta_0 = 0\), \(\beta_1 = 1\), \(\beta_2 = 1\), and our learning rate \(\alpha = 0.1\). Calculate the updated coefficients after one iteration of Gradient Descent.</p>
+        <div class="continue-button" onclick="showNextSection(13)">Continue</div>
+            </section>
+    <section id="section13">
+        <div class="test-your-knowledge">
+            <h3>Test Your Knowledge</h3>
+            <h4>Try to solve this problem on your own before revealing the solution.</h4>
+            <button class="check-button" onclick="revealAnswer('complex-example-solution')">Reveal</button>
+            <div id="complex-example-solution" style="display: none;">
+                <p><strong>1. Calculate Predictions:</strong></p>
+                <ul>
+                    <li>For the first data point (1, 2): \(f(1, 2) = 0 + 1*1 + 1*2 = 3\)</li>
+                    <li>For the second data point (2, 3): \(f(2, 3) = 0 + 1*2 + 1*3 = 5\)</li>
+                    <li>For the third data point (3, 1): \(f(3, 1) = 0 + 1*3 + 1*1 = 4\)</li>
+                </ul>
+                <p><strong>2. Calculate the partial derivatives for each coefficient:</strong></p>
+                <ul>
+                    <li>\(\frac{∂C}{∂\beta_0} = -\frac{1}{3} [(5-3) + (8-5) + (7-4)] = -2\)</li>
+                    <li>\(\frac{∂C}{∂\beta_1} = -\frac{1}{3} [1(5-3) + 2(8-5) + 3(7-4)] = -\frac{17}{3}\)</li>
+                    <li>\(\frac{∂C}{∂\beta_2} = -\frac{1}{3} [2(5-3) + 3(8-5) + 1(7-4)] = -\frac{16}{3}\)</li>
+                </ul>
+                <p><strong>3. Update the Coefficients:</strong></p>
+                <ul>
+                    <li>\(\beta_{0,\text{new}} = 0 - 0.1*(-2) = 0.2\)</li>
+                    <li>\(\beta_{1,\text{new}} = 1 - 0.1*(-17/3) ≈ 1.57\)</li>
+                    <li>\(\beta_{2,\text{new}} = 1 - 0.1*(-16/3) ≈ 1.53\)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="continue-button" onclick="showNextSection(14)">Continue</div>
+            </section>
+    <section id="section14">
+        <div class="stop-and-think">
+            <h3>Stop and Think</h3>
+            <h4>Experiment with different learning rates in the interactive table. How does changing the learning rate affect how quickly the coefficients change and how close they get to the solution?</h4>
+            <button class="reveal-button" onclick="revealAnswer('learning-rate-effect')">Reveal</button>
+            <p id="learning-rate-effect" style="display: none;">A smaller learning rate leads to slower changes in the coefficients but potentially a more stable convergence. A larger learning rate might converge faster but risks overshooting the optimal solution and oscillating or even diverging.</p>
+        </div>
+        <div class="continue-button" onclick="showNextSection(15)">Continue</div>
+    </section>
+
+    <section id="section15">
+        <h3>Review and Reflect</h3>
+        <p>Let's recap what we've learned. We applied gradient descent to a linear regression model using the Sum of Squares Error as our cost function. We calculated the gradient of this cost function, a vector of partial derivatives with respect to each coefficient. Using this gradient, we updated our initial coefficient guesses, taking a step towards minimizing the error.</p>
+        <div class="continue-button" onclick="showNextSection(16)">Continue</div>
+            </section>
+    <section id="section16">
+        <p>We also saw how a larger dataset with multiple features requires calculating the gradient and updating each coefficient individually. Importantly, we observed how the learning rate influences the speed and stability of convergence.</p>
+        <div class="image-placeholder">
+            <img src="/placeholder.svg?height=300&width=600" alt="Image of multiple paths down a hill converging at the bottom, representing different learning rates leading to the same minimum.">
+        </div>
+    </section>
+
+    <script>
+        // Show the first section initially
+        document.getElementById("section1").style.display = "block";
+        document.getElementById("section1").style.opacity = "1";
+
+        function showNextSection(nextSectionId) {
+            const currentButton = event.target;
+            const nextSection = document.getElementById("section" + nextSectionId);
+            
+            currentButton.style.display = "none";
+            
+            nextSection.style.display = "block";
+            setTimeout(() => {
+                nextSection.style.opacity = "1";
+            }, 10);
+
+            setTimeout(() => {
+                nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 500);
+        }
+
+        function revealAnswer(id) {
+            const revealText = document.getElementById(id);
+            const revealButton = event.target;
+            
+            revealText.style.display = "block";
+            revealButton.style.display = "none";
+        }
+    </script>
+</body>
+</html>
